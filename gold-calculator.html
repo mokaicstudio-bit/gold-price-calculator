@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة أسعار الذهب</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            padding: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .price-display {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .radio-option {
+            flex: 1;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .sub-options {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .sub-options.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sub-option {
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        .sub-option input[type="radio"] {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .sub-option label {
+            cursor: pointer;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .result {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            border-radius: 15px;
+            animation: slideDown 0.5s ease;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 1.1em;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-note {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 حاسبة أسعار الذهب</h1>
+            <div id="currentDate" style="font-size: 0.95em; margin-top: 5px; opacity: 0.9;"></div>
+            <div id="priceDisplay" class="price-display">
+                <div class="loading">جاري تحميل الأسعار...</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <div class="section-title">نوع القطعة</div>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="jewelry" name="type" value="jewelry" checked>
+                        <label for="jewelry">حلي</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="bars" name="type" value="bars">
+                        <label for="bars">سبائك</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="coins" name="type" value="coins">
+                        <label for="coins">جنيهات</label>
+                    </div>
+                </div>
+
+                <!-- خيارات الحلي -->
+                <div id="jewelryOptions" class="sub-options active">
+                    <div class="sub-option">
+                        <input type="radio" id="gold24" name="karat" value="24" checked>
+                        <label for="gold24">عيار 24</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="gold22" name="karat" value="22">
+                        <label for="gold22">عيار 22</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="gold21" name="karat" value="21">
+                        <label for="gold21">عيار 21</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="gold18" name="karat" value="18">
+                        <label for="gold18">عيار 18</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="gold14" name="karat" value="14">
+                        <label for="gold14">عيار 14</label>
+                    </div>
+                </div>
+
+                <!-- خيارات السبائك -->
+                <div id="barsOptions" class="sub-options">
+                    <div class="sub-option">
+                        <input type="radio" id="bar1g" name="barSize" value="1">
+                        <label for="bar1g">سبيكة 1 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="bar2.5g" name="barSize" value="2.5">
+                        <label for="bar2.5g">سبيكة 2.5 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="bar5g" name="barSize" value="5">
+                        <label for="bar5g">سبيكة 5 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="bar10g" name="barSize" value="10">
+                        <label for="bar10g">سبيكة 10 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="bar20g" name="barSize" value="20">
+                        <label for="bar20g">سبيكة 20 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="bar50g" name="barSize" value="50">
+                        <label for="bar50g">سبيكة 50 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="bar100g" name="barSize" value="100">
+                        <label for="bar100g">سبيكة 100 جرام</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="barTola" name="barSize" value="11.664">
+                        <label for="barTola">سبيكة تولة (11.664 جرام)</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="barKilo" name="barSize" value="1000">
+                        <label for="barKilo">سبيكة 1 كيلو</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="barHalfKilo" name="barSize" value="500">
+                        <label for="barHalfKilo">سبيكة نصف كيلو</label>
+                    </div>
+                </div>
+
+                <!-- خيارات الجنيهات -->
+                <div id="coinsOptions" class="sub-options">
+                    <div class="sub-option">
+                        <input type="radio" id="coin21" name="coinType" value="21">
+                        <label for="coin21">جنيه عيار 21</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="coin22" name="coinType" value="22">
+                        <label for="coin22">جنيه عيار 22</label>
+                    </div>
+                    <div class="sub-option">
+                        <input type="radio" id="coin24" name="coinType" value="24">
+                        <label for="coin24">جنيه عيار 24</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="input-group">
+                    <label>وزن القطعة بالجرام:</label>
+                    <input type="number" id="weight" placeholder="مثال: 10" step="0.01" min="0.01">
+                    <div id="weightNote" class="info-note" style="display: none;">* الجنيهات تزن حوالي 8 جرام</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="input-group">
+                    <label>سعر القطعة الإجمالي (بالريال):</label>
+                    <input type="number" id="totalPrice" placeholder="مثال: 5000" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeTax" checked>
+                    <label for="includeTax">شامل الضريبة (15%)</label>
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculate()">احسب السعر</button>
+
+            <div id="result" class="result">
+                <div class="result-title">النتيجة:</div>
+                <div class="result-item">
+                    <span>سعر الجرام:</span>
+                    <span id="gramPrice">0 ريال</span>
+                </div>
+                <div class="result-item">
+                    <span>سعر إجمالي الجرامات:</span>
+                    <span id="goldValue">0 ريال</span>
+                </div>
+                <div class="result-item">
+                    <span>سعر المصنعية:</span>
+                    <span id="makingChargeValue">0 ريال</span>
+                </div>
+                <div class="result-item">
+                    <span>مبلغ الضريبة (15%):</span>
+                    <span id="taxValue">0 ريال</span>
+                </div>
+                <div class="result-item">
+                    <span>الإجمالي:</span>
+                    <span id="totalValue">0 ريال</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // الأسعار الحالية
+        let goldPrices = {
+            '24': 554.36,
+            '22': 508.17,
+            '21': 485.07,
+            '18': 415.77,
+            '14': 323.38
+        };
+        let lastUpdateTime = '01:31:02am';
+
+        // عرض التاريخ
+        function displayDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const arabicDate = now.toLocaleDateString('ar-SA', options);
+            document.getElementById('currentDate').textContent = arabicDate;
+        }
+
+        // جلب الأسعار من API
+        async function fetchPrices() {
+            try {
+                const priceDisplay = document.getElementById('priceDisplay');
+                priceDisplay.innerHTML = '<div class="loading">جاري تحميل الأسعار...</div>';
+
+                // استبدل هذا الرابط بعنوان الـ API الخاص بك
+                // مثال: http://your-server.com/api/gold-prices
+                const apiUrl = 'http://localhost:5000/api/gold-prices';
+                
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if (data.success && data.prices) {
+                    goldPrices = data.prices;
+                    lastUpdateTime = data.updateTime || '';
+                    displayPrices(false);
+                } else if (data.fallback) {
+                    goldPrices = data.fallback;
+                    displayPrices(true);
+                } else {
+                    displayPrices(true);
+                }
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+                displayPrices(true);
+            }
+        }
+
+        // عرض الأسعار
+        function displayPrices(isOffline = false) {
+            const priceDisplay = document.getElementById('priceDisplay');
+            let html = '';
+            
+            if (isOffline) {
+                html += '<div style="color: #ff9800; margin-bottom: 10px; font-size: 0.85em;">⚠️ وضع عدم الاتصال - الأسعار من آخر تحديث</div>';
+            } else if (lastUpdateTime) {
+                html += `<div style="color: #4caf50; margin-bottom: 10px; font-size: 0.85em;">✓ آخر تحديث: ${lastUpdateTime}</div>`;
+            }
+            
+            html += Object.entries(goldPrices)
+                .map(([karat, price]) => 
+                    `<div class="price-item"><span>عيار ${karat}:</span><span>${price.toFixed(2)} ريال/جرام</span></div>`
+                ).join('');
+            
+            priceDisplay.innerHTML = html;
+        }
+
+        // التعامل مع تغيير نوع القطعة
+        document.querySelectorAll('input[name="type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.sub-options').forEach(option => {
+                    option.classList.remove('active');
+                });
+
+                const weightNote = document.getElementById('weightNote');
+                
+                if (this.value === 'jewelry') {
+                    document.getElementById('jewelryOptions').classList.add('active');
+                    weightNote.style.display = 'none';
+                } else if (this.value === 'bars') {
+                    document.getElementById('barsOptions').classList.add('active');
+                    weightNote.style.display = 'none';
+                } else if (this.value === 'coins') {
+                    document.getElementById('coinsOptions').classList.add('active');
+                    weightNote.style.display = 'block';
+                }
+            });
+        });
+
+        function calculate() {
+            const type = document.querySelector('input[name="type"]:checked').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const totalPrice = parseFloat(document.getElementById('totalPrice').value);
+            const includeTax = document.getElementById('includeTax').checked;
+
+            if (!weight || weight <= 0) {
+                alert('الرجاء إدخال وزن صحيح');
+                return;
+            }
+
+            if (!totalPrice || totalPrice <= 0) {
+                alert('الرجاء إدخال سعر القطعة الإجمالي');
+                return;
+            }
+
+            let pricePerGram = 0;
+            let actualWeight = weight;
+
+            if (type === 'jewelry') {
+                const karat = document.querySelector('input[name="karat"]:checked').value;
+                pricePerGram = goldPrices[karat] || 0;
+            } else if (type === 'bars') {
+                const barSize = parseFloat(document.querySelector('input[name="barSize"]:checked')?.value || 0);
+                actualWeight = barSize;
+                pricePerGram = goldPrices['24'] || 0;
+            } else if (type === 'coins') {
+                const coinType = document.querySelector('input[name="coinType"]:checked').value;
+                pricePerGram = goldPrices[coinType] || 0;
+                actualWeight = 8;
+            }
+
+            if (!pricePerGram) {
+                alert('الرجاء تحديد نوع العيار');
+                return;
+            }
+
+            // حساب قيمة الذهب الخام
+            const goldValue = pricePerGram * actualWeight;
+
+            // حساب المصنعية والضريبة
+            let makingChargeValue = 0;
+            let taxValue = 0;
+
+            if (includeTax) {
+                const subtotal = totalPrice / 1.15;
+                makingChargeValue = subtotal - goldValue;
+                taxValue = totalPrice - subtotal;
+            } else {
+                makingChargeValue = totalPrice - goldValue;
+                taxValue = totalPrice * 0.15;
+            }
+
+            const total = includeTax ? totalPrice : totalPrice + taxValue;
+
+            // عرض النتائج
+            document.getElementById('gramPrice').textContent = `${pricePerGram.toFixed(2)} ريال`;
+            document.getElementById('goldValue').textContent = `${goldValue.toFixed(2)} ريال`;
+            document.getElementById('makingChargeValue').textContent = `${makingChargeValue.toFixed(2)} ريال`;
+            document.getElementById('taxValue').textContent = `${taxValue.toFixed(2)} ريال`;
+            document.getElementById('totalValue').textContent = `${total.toFixed(2)} ريال`;
+
+            document.getElementById('result').classList.add('show');
+        }
+
+        // تهيئة الصفحة
+        displayDate();
+        
+        // محاولة جلب الأسعار من API
+        fetchPrices();
+        
+        // تحديث الأسعار كل 5 دقائق
+        setInterval(fetchPrices, 300000);
+    </script>
+</body>
+</html>
